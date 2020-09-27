@@ -5,13 +5,11 @@ namespace Payments.Api.Tests
 {
     public class TestBase : IDisposable
     {
-        protected Fixture Fixture { get; }
-        protected PrivateAccessHelper PrivateAccessHelper { get; }
+        protected Fixture Fixture { get; }       
 
         public TestBase()
         {
-            Fixture = new Fixture();
-            PrivateAccessHelper = new PrivateAccessHelper();
+            Fixture = new Fixture();            
         }
 
         public void Dispose()

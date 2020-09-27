@@ -7,12 +7,12 @@ namespace Payments.Api.Services
 {
     public class PaymentService : IPaymentService
     {
-        const decimal FineForLessThanThreeDays = 0.02M;
-        const decimal FineForLessThanFiveDays = 0.03M;
-        const decimal FineForMoreThanFiveDays = 0.05M;
-        const decimal InterestForLessThanThreeDays = 0.0001M;
-        const decimal InterestForLessThanFiveDays = 0.0002M;
-        const decimal InterestForMoreThanFiveDay = 0.0003M;
+        public const decimal FineForLessThanThreeDays = 0.02M;
+        public const decimal FineForLessThanFiveDays = 0.03M;
+        public const decimal FineForMoreThanFiveDays = 0.05M;
+        public const decimal InterestForLessThanThreeDays = 0.001M;
+        public const decimal InterestForLessThanFiveDays = 0.002M;
+        public const decimal InterestForMoreThanFiveDay = 0.003M;
 
         private readonly IPaymentRepository _paymentRepository;
 
@@ -23,35 +23,25 @@ namespace Payments.Api.Services
 
         public Task<IEnumerable<Payment>> GetPaymentsAsync()
         {
-            throw new System.NotImplementedException();
+            return _paymentRepository.GetPaymentsAsync();
         }
 
         public Task<Payment> SavePaymetAsync(NewPayment newPayment)
-        {            
-            var adjustedValue = GetAdjustedValue(newPayment);
+        {
+            var fine = GetFine(newPayment);
+            var interest = GetInterest(newPayment);
 
-            var payment = new Payment(
-            newPayment.Name,
-            newPayment.Value.Value,
-            adjustedValue,
-            newPayment.PaymentDate.Value,
-            newPayment.DueDate.Value);
+            var payment = new Payment
+            (
+                newPayment.Name,
+                newPayment.Value.Value,            
+                newPayment.PaymentDate.Value,
+                newPayment.DueDate.Value,
+                fine,
+                interest
+            );
 
             return _paymentRepository.SaveAsync(payment);
-        }
-
-        private decimal? GetAdjustedValue(NewPayment newPayment)
-        {
-            if (!newPayment.IsLate)
-            {
-                return null;
-            }
-
-            var interest = GetDailyInterest(newPayment);
-            var fine = GetFine(newPayment);
-
-            var value = newPayment.Value;
-            return value + (value * (interest * newPayment.DelayInDays)) + (value * fine);
         }
 
         private decimal? GetFine(NewPayment newPayment)
@@ -75,7 +65,7 @@ namespace Payments.Api.Services
             }
         }
 
-        private decimal? GetDailyInterest(NewPayment newPayment)
+        private decimal? GetInterest(NewPayment newPayment)
         {
             if (!newPayment.IsLate)
             {
