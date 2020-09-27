@@ -38,8 +38,11 @@ namespace Payments.Api.Domain
             {
                 return null;
             }
-            
-            return Value + (Value * (Interest * DelayInDays)) + (Value * Fine);
+
+            var interestValue = Value * (Interest * DelayInDays);
+            var fineValue = Value * Fine;
+
+            return Value + interestValue  + fineValue;
         }
     }
 }
