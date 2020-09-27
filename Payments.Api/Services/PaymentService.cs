@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Payments.Api.Domain;
 using Payments.Api.Repositories;
+using System.Linq;
 
 namespace Payments.Api.Services
 {
@@ -21,12 +22,13 @@ namespace Payments.Api.Services
             _paymentRepository = paymentRepository;
         }
 
-        public Task<IEnumerable<Payment>> GetPaymentsAsync()
+        public async Task<IEnumerable<PaymentVisualization>> GetPaymentsAsync()
         {
-            return _paymentRepository.GetPaymentsAsync();
+            var payments = await _paymentRepository.GetPaymentsAsync();
+            return payments.Select(p => GetPaymentVisualization(p));
         }
 
-        public Task<Payment> SavePaymetAsync(NewPayment newPayment)
+        public async Task<PaymentVisualization> SavePaymetAsync(NewPayment newPayment)
         {
             var fine = GetFine(newPayment);
             var interest = GetInterest(newPayment);
@@ -41,7 +43,20 @@ namespace Payments.Api.Services
                 interest
             );
 
-            return _paymentRepository.SaveAsync(payment);
+            await _paymentRepository.SaveAsync(payment);
+            return GetPaymentVisualization(payment);
+        }
+
+        private PaymentVisualization GetPaymentVisualization(Payment payment)
+        {
+            return new PaymentVisualization()
+            {
+                Name = payment.Name,
+                Value = payment.Value,
+                AdjustedValue = payment.GetAdjustedValue(),
+                DueDate = payment.DueDate,
+                PaymentDate = payment.PaymentDate
+            };
         }
 
         private decimal? GetFine(NewPayment newPayment)

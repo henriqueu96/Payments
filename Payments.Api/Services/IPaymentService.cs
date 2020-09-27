@@ -7,7 +7,7 @@ namespace Payments.Api.Services
 {
     public interface IPaymentService
     {
-        Task<Payment> SavePaymetAsync(NewPayment newPaymentModel);
-        Task<IEnumerable<Payment>> GetPaymentsAsync();
+        Task<PaymentVisualization> SavePaymetAsync(NewPayment newPaymentModel);
+        Task<IEnumerable<PaymentVisualization>> GetPaymentsAsync();
     }
 }

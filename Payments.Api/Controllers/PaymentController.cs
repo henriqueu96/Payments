@@ -5,6 +5,7 @@ using Payments.Api.Services;
 
 namespace Payments.Api.Controllers
 {
+    [Route("payment")]
     public class PaymentController : ControllerBase
     {
         IPaymentService _paymentService;
@@ -14,7 +15,7 @@ namespace Payments.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SavePaymentAsync(NewPayment newPayment)
+        public async Task<IActionResult> SavePaymentAsync([FromBody]NewPayment newPayment)
         {
             if (newPayment == null || !newPayment.IsValid)
             {
