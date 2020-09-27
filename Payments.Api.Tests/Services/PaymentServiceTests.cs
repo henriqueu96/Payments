@@ -6,7 +6,6 @@ using Payments.Api.Services;
 using Xunit;
 using AutoFixture;
 using System;
-using FluentAssertions;
 
 namespace Payments.Api.Tests.Services
 {
@@ -28,27 +27,124 @@ namespace Payments.Api.Tests.Services
 
             await _paymentService.SavePaymetAsync(newPayment);
             _paymentRepositoryMock.Verify(
-                p => p.SaveAsync (
-                    It.Is<Payment>(p=> p.Name == newPayment.Name)
+                p => p.SaveAsync(
+                    It.Is<Payment>(p => p.Name == newPayment.Name)
                )
             );
         }
 
         [Fact]
-        public void GetAjustedValue()
+        public async Task SavePayment_ShouldSetPaymentFineT0_02()
         {
-            var newPayment = new NewPayment()
+            var newPayment = new NewPayment
             {
-                Name = "name",
+                Name = "Teste",
                 Value = 100,
-                PaymentDate = DateTime.Now,
-                DueDate = DateTime.Now.AddHours(25) 
+                DueDate = DateTime.Today,
+                PaymentDate = DateTime.Today.AddDays(1)
             };
 
-            var result = (decimal?) PrivateAccessHelper
-                .InvokePrivateMethod("GetAdjustedValue", _paymentService, newPayment);
+            await _paymentService.SavePaymetAsync(newPayment);
+            _paymentRepositoryMock.Verify(
+                p => p.SaveAsync(
+                    It.Is<Payment>(p => p.Fine == PaymentService.FineForLessThanThreeDays)
+               )
+            );
+        }
 
-            result.Value.Should().Be(101M);
+        [Fact]
+        public async Task SavePayment_ShouldSetPaymentFineT0_03()
+        {
+            var newPayment = new NewPayment
+            {
+                Name = "Teste",
+                Value = 100,
+                DueDate = DateTime.Today,
+                PaymentDate = DateTime.Today.AddDays(5)
+            };
+
+            await _paymentService.SavePaymetAsync(newPayment);
+            _paymentRepositoryMock.Verify(
+                p => p.SaveAsync(
+                    It.Is<Payment>(p => p.Fine == PaymentService.FineForLessThanFiveDays)
+               )
+            );
+        }
+
+        [Fact]
+        public async Task SavePayment_ShouldSetPaymentFineT0_05()
+        {
+            var newPayment = new NewPayment
+            {
+                Name = "Teste",
+                Value = 100,
+                DueDate = DateTime.Today,
+                PaymentDate = DateTime.Today.AddDays(6)
+            };
+
+            await _paymentService.SavePaymetAsync(newPayment);
+            _paymentRepositoryMock.Verify(
+                p => p.SaveAsync(
+                    It.Is<Payment>(p => p.Fine == PaymentService.FineForMoreThanFiveDays)
+               )
+            );
+        }
+
+        [Fact]
+        public async Task SavePayment_ShouldSetPaymentInterestTo0_001()
+        {
+            var newPayment = new NewPayment
+            {
+                Name = "Teste",
+                Value = 100,
+                DueDate = DateTime.Today,
+                PaymentDate = DateTime.Today.AddDays(1)
+            };
+
+            await _paymentService.SavePaymetAsync(newPayment);
+            _paymentRepositoryMock.Verify(
+                p => p.SaveAsync(
+                    It.Is<Payment>(p => p.Interest == PaymentService.InterestForLessThanThreeDays)
+               )
+            );
+        }
+
+        [Fact]
+        public async Task SavePayment_ShouldSetPaymentInterestTo0_002()
+        {
+            var newPayment = new NewPayment
+            {
+                Name = "Teste",
+                Value = 100,
+                DueDate = DateTime.Today,
+                PaymentDate = DateTime.Today.AddDays(4)
+            };
+
+            await _paymentService.SavePaymetAsync(newPayment);
+            _paymentRepositoryMock.Verify(
+                p => p.SaveAsync(
+                    It.Is<Payment>(p => p.Interest == PaymentService.InterestForLessThanFiveDays)
+               )
+            );
+        }
+
+        [Fact]
+        public async Task SavePayment_ShouldSetPaymentInterestTo0_003()
+        {
+            var newPayment = new NewPayment
+            {
+                Name = "Teste",
+                Value = 100,
+                DueDate = DateTime.Today,
+                PaymentDate = DateTime.Today.AddDays(6)
+            };
+
+            await _paymentService.SavePaymetAsync(newPayment);
+            _paymentRepositoryMock.Verify(
+                p => p.SaveAsync(
+                    It.Is<Payment>(p => p.Interest == PaymentService.InterestForMoreThanFiveDay)
+               )
+            );
         }
     }
 }
