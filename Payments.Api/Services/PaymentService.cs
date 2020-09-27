@@ -10,9 +10,9 @@ namespace Payments.Api.Services
         const decimal FineForLessThanThreeDays = 0.02M;
         const decimal FineForLessThanFiveDays = 0.03M;
         const decimal FineForMoreThanFiveDays = 0.05M;
-        const decimal InterestForLessThanThreeDays = 0.001M;
-        const decimal InterestForLessThanFiveDays = 0.002M;
-        const decimal InterestForMoreThanFiveDay = 0.003M;
+        const decimal InterestForLessThanThreeDays = 0.0001M;
+        const decimal InterestForLessThanFiveDays = 0.0002M;
+        const decimal InterestForMoreThanFiveDay = 0.0003M;
 
         private readonly IPaymentRepository _paymentRepository;
 

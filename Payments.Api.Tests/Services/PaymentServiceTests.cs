@@ -35,20 +35,37 @@ namespace Payments.Api.Tests.Services
         }
 
         [Fact]
-        public void GetAjustedValue()
+        public void GetAjustedValue_ShouldReturn102And01_WhenValueIs100AndDelayIsOneDay()
         {
             var newPayment = new NewPayment()
             {
                 Name = "name",
                 Value = 100,
-                PaymentDate = DateTime.Now,
-                DueDate = DateTime.Now.AddHours(25) 
+                PaymentDate = DateTime.Now.AddHours(25),
+                DueDate = DateTime.Now
             };
 
             var result = (decimal?) PrivateAccessHelper
                 .InvokePrivateMethod("GetAdjustedValue", _paymentService, newPayment);
 
-            result.Value.Should().Be(101M);
+            result.Value.Should().Be(102.01M);
+        }
+
+        [Fact]
+        public void GetAjustedValue_ShouldReturn103And08_WhenValueIs100AndDelayIsForDays()
+        {
+            var newPayment = new NewPayment()
+            {
+                Name = "name",
+                Value = 100,
+                PaymentDate = DateTime.Now.AddDays(3).AddHours(25),
+                DueDate = DateTime.Now
+            };
+
+            var result = (decimal?)PrivateAccessHelper
+                .InvokePrivateMethod("GetAdjustedValue", _paymentService, newPayment);
+
+            result.Value.Should().Be(103.08M);
         }
     }
 }
