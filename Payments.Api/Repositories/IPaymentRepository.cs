@@ -6,7 +6,7 @@ namespace Payments.Api.Repositories
 {
     public interface IPaymentRepository
     {
-        Task<Payment> SaveAsync(Payment payment);
+        Task SaveAsync(Payment payment);
         Task<IEnumerable<Payment>> GetPaymentsAsync();
     }
 }
